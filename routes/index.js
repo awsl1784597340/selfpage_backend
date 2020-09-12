@@ -10,6 +10,11 @@ connection.connect()
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+      app.use(express.static(__dirname+"/public",{index:"index.html"}));
+      // res.render('index', { title: 'Express' });
+});
+
+router.get('/info',function (req,res,next) {
   connection.query('select num from num where id = 0',(err,rows)=>{
     if(err){
       res.status(503)
@@ -23,20 +28,17 @@ router.get('/', function(req, res, next) {
       connection.query('INSERT INTO ip (ip) VALUES (?)',[req.ip],(err,rows)=>{
         if(err)throw err
       })
-      res.json({id:num})
-      // res.render('index', { title: 'Express' });
+
+      connection.query('select num from num where id = 0', (err, rows) => {
+
+        let numb = rows[0].num
+        console.log(numb)
+        res.json({num: numb, ip: req.ip})
+      })
+
     }
   })
 
-});
-
-router.get('/info',function (req,res,next) {
-  connection.query('select num from num where id = 0', (err, rows) => {
-
-    let numb = rows[0].num
-    console.log(numb)
-    res.json({num: numb, ip: req.ip})
-  })
 });
 
 router.post('/upload',multipartMiddleware,function (req,res,next) {
